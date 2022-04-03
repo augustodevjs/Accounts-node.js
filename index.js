@@ -43,16 +43,14 @@ function buildAccount() {
     const accountName = answer['accountName'];
     console.info(accountName);
 
+    /* Verifica se não existe um diretório account.
+    Se não existe, ocorre a criação do mesmo */
     if(!fs.existsSync('accounts')) {
       fs.mkdirSync('accounts');
     }
 
-    if(fs.existsSync(`accounts/${accountName}.json`)){
-      console.log(chalk.bgRed.black('Esta conta já existe, escolhe outro nome!'));
-      buildAccount();
-      return;
-    }
-
+    /* Cria um arquivo json com o nome da conta, 
+    dentro desse arquivo possui um balance com o valor 0 */
     fs.writeFileSync(
       `accounts/${accountName}.json`, 
       '{"balance": 0}', 
@@ -61,8 +59,17 @@ function buildAccount() {
       }
     )
 
+    /* Verifica se foi criado duas contas com o mesmo nome,
+    se for criado, você recebe uma mensagem de erro */
+    if(fs.existsSync(`accounts/${accountName}.json`)){
+      console.log(chalk.bgRed.black('Esta conta já existe, escolhe outro nome!'));
+      buildAccount();
+      return;
+    }
+
     console.log(chalk.green('Parabéns, a sua conta foi criada!'));
     operation();
+
     })
   .catch(err => console.log(err));
 };
