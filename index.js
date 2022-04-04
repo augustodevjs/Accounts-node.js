@@ -23,7 +23,7 @@ function operation() {
     } else if(action === 'Depositar') {
       deposit();
     } else if(action === 'Consultar Saldo') {
-
+      getAccountBalance();
     } else if(action === 'Sacar') {
 
     } else if(action === 'Sair') {
@@ -84,15 +84,6 @@ function buildAccount() {
   .catch(err => console.log(err));
 };
 
-function checkAccount(accountName) {
-  if(!fs.existsSync(`accounts/${accountName}.json`)) {
-    console.log(chalk.bgRed.black('Esta conta não existe, escolha outro nome!'));
-    return false;
-  } else {
-    return true;
-  }
-}
-
 // add an amount to user account
 function deposit() {
   inquirer.prompt([
@@ -129,6 +120,15 @@ function deposit() {
   .catch(err => console.log(err));
 };
 
+function checkAccount(accountName) {
+  if(!fs.existsSync(`accounts/${accountName}.json`)) {
+    console.log(chalk.bgRed.black('Esta conta não existe, escolha outro nome!'));
+    return false;
+  } else {
+    return true;
+  }
+}
+
 function addAmount(accountName, amount) {
   const accountData = getAccount(accountName);
 
@@ -149,6 +149,7 @@ function addAmount(accountName, amount) {
   console.log(chalk.green(`Foi depositado o valor de R$${amount} na sua conta!`))
 };
 
+// lê o arquivo json que foi criado é retorna o seu conteúdo em formato de objeto.
 function getAccount(accountName) {
   const accountJson = fs.readFileSync(`accounts/${accountName}.json`, {
     encoding: 'utf8',
@@ -156,3 +157,27 @@ function getAccount(accountName) {
   })
   return JSON.parse(accountJson)
 };
+
+// show account balance
+function getAccountBalance() {
+  inquirer.prompt([
+    {
+      name: 'accountName',
+      message: 'Qual o nome da sua conta?'
+    }
+  ])
+  .then((answer) => {
+    const accountName = answer['accountName'];
+
+    // verify if account exists
+    if(!checkAccount(accountName)) {
+      return getAccountBalance();
+    }
+
+    const accountData = getAccount(accountName);
+    console.log(chalk.bgBlue.black(`O saldo da sua conta é de R$${accountData.balance}`));
+    operation();
+
+  })
+  .catch(err => console.log(err));
+}
