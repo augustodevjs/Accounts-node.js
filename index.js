@@ -20,6 +20,15 @@ function operation() {
     const action = answer['action'];
     if(action === 'Criar conta') {
       createAccount();
+    } else if(action === 'Depositar') {
+      deposit();
+    } else if(action === 'Consultar Saldo') {
+
+    } else if(action === 'Sacar') {
+
+    } else if(action === 'Sair') {
+      console.log(chalk.bgBlue.black('Obrigado por usar o Accounts!'));
+      process.exit();
     }
   })
   .catch(err => console.log(err))
@@ -49,6 +58,15 @@ function buildAccount() {
       fs.mkdirSync('accounts');
     }
 
+     /* Verifica se o arquivo existe, se ele existir,
+    você vai receber uma mensagem de aviso para criar uma conta 
+    com nome diferente */
+    if(fs.existsSync(`accounts/${accountName}.json`)){
+      console.log(chalk.bgRed.black('Esta conta já existe, escolhe outro nome!'));
+      buildAccount();
+      return;
+    }
+
     /* Cria um arquivo json com o nome da conta, 
     dentro desse arquivo possui um balance com o valor 0 */
     fs.writeFileSync(
@@ -59,17 +77,37 @@ function buildAccount() {
       }
     )
 
-    /* Verifica se foi criado duas contas com o mesmo nome,
-    se for criado, você recebe uma mensagem de erro */
-    if(fs.existsSync(`accounts/${accountName}.json`)){
-      console.log(chalk.bgRed.black('Esta conta já existe, escolhe outro nome!'));
-      buildAccount();
-      return;
-    }
-
     console.log(chalk.green('Parabéns, a sua conta foi criada!'));
     operation();
 
     })
   .catch(err => console.log(err));
 };
+
+// add an amount to user account
+function deposit() {
+  inquirer.prompt([
+    {
+      name: 'accountName',
+      message: 'Qual o nome da sua conta?'
+    },
+  ])
+  .then((answer) => {
+    const accountName = answer['accountName'];
+
+    // verify if account exists
+    if(!checkAccount(accountName)) {
+      return deposit();
+    }
+  })
+  .catch(err => console.log(err));
+};
+
+function checkAccount(accountName) {
+  if(!fs.existsSync(`accounts/${accountName}.json`)) {
+    console.log(chalk.bgRed.black('Esta conta não existe, escolha outro nome!'));
+    return false;
+  } else {
+    return true;
+  }
+}
