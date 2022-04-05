@@ -101,44 +101,6 @@ function deposit() {
   .catch(err => console.log(err));
 };
 
-function checkAccount(accountName) {
-  if(!fs.existsSync(`accounts/${accountName}.json`)) {
-    console.log(chalk.bgRed.black('Esta conta não existe, escolha outro nome!'));
-    return false;
-  } else {
-    return true;
-  }
-}
-
-function addAmount(accountName, amount) {
-  const accountData = getAccount(accountName);
-
-  if(!amount) {
-    console.log(chalk.bgRed.black('Ocorreu um erro, tente novamente mais tarde!'));
-    return deposit();
-  }
-
-  accountData.balance = parseFloat(amount) + parseFloat(accountData.balance);
-
-  fs.writeFileSync(
-    `accounts/${accountName}.json`, 
-    JSON.stringify(accountData),
-    function (err) {
-      console.log(err);
-    } 
-  )
-  console.log(chalk.green(`Foi depositado o valor de R$${amount} na sua conta!`))
-  operation();
-};
-
-function getAccount(accountName) {
-  const accountJson = fs.readFileSync(`accounts/${accountName}.json`, {
-    encoding: 'utf8',
-    flag: 'r'
-  })
-  return JSON.parse(accountJson)
-};
-
 function getAccountBalance() {
   inquirer.prompt([
     {
@@ -188,6 +150,44 @@ function withdraw() {
     .catch((err) => {console.log(err)})
   })
   .catch(err => console.log(err));
+};
+
+function checkAccount(accountName) {
+  if(!fs.existsSync(`accounts/${accountName}.json`)) {
+    console.log(chalk.bgRed.black('Esta conta não existe, escolha outro nome!'));
+    return false;
+  } else {
+    return true;
+  }
+}
+
+function addAmount(accountName, amount) {
+  const accountData = getAccount(accountName);
+
+  if(!amount) {
+    console.log(chalk.bgRed.black('Ocorreu um erro, tente novamente mais tarde!'));
+    return deposit();
+  }
+
+  accountData.balance = parseFloat(amount) + parseFloat(accountData.balance);
+
+  fs.writeFileSync(
+    `accounts/${accountName}.json`, 
+    JSON.stringify(accountData),
+    function (err) {
+      console.log(err);
+    } 
+  )
+  console.log(chalk.green(`Foi depositado o valor de R$${amount} na sua conta!`))
+  operation();
+};
+
+function getAccount(accountName) {
+  const accountJson = fs.readFileSync(`accounts/${accountName}.json`, {
+    encoding: 'utf8',
+    flag: 'r'
+  })
+  return JSON.parse(accountJson)
 };
 
 function removeAmount(accountName, amount) {
